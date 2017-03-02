@@ -24,6 +24,30 @@ public class MainActivity extends AppCompatActivity {
                 return NDKHelper.stringFromJNI("stringFromJNI");
             }
         });
+
+        addLayout("点击", "JNI 访问、修改数组", new ClickListener() {
+            @Override
+            public String getResult() {
+                int[] arr = new int[10];
+                for (int i = 0; i < arr.length; i++) {
+                    arr[i] = i;
+                }
+
+                StringBuffer buffer = new StringBuffer();
+                buffer.append("before :");
+                for (int i = 0; i < arr.length; i++) {
+                    buffer.append(arr[i] + " ");
+                }
+
+                buffer.append("\n" + NDKHelper.sumArray(arr) +"\n");
+
+                buffer.append("after    :");
+                for (int i = 0; i < arr.length; i++) {
+                    buffer.append(arr[i] + " ");
+                }
+                return buffer.toString();
+            }
+        });
     }
 
     private void addLayout(String name, String info, final ClickListener listner) {

@@ -15,4 +15,6 @@ public class NDKHelper {
      */
     public static native String stringFromJNI(String info);
 
+    public static native int sumArray(int[] arr);
+
 }
