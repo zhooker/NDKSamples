@@ -1,5 +1,7 @@
 package com.example.ndktest.ndk;
 
+import com.example.ndktest.ClassField;
+
 /**
  * Created by zhuangsj on 17-2-28.
  */
@@ -21,5 +23,7 @@ public class NDKHelper {
 
     public static native String callJavaInstaceMethod();
 
+    public native static void accessInstanceField(ClassField obj);
 
+    public native static int accessStaticField();
 }

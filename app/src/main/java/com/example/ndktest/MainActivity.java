@@ -56,6 +56,19 @@ public class MainActivity extends AppCompatActivity {
                         NDKHelper.callJavaStaticMethod();
             }
         });
+
+        addLayout("点击", "C++ 访问 Java 实例变量和静态变量", new ClickListener() {
+            @Override
+            public String getResult() {
+                ClassField obj = new ClassField();
+                obj.setNum(10);
+                obj.setStr("Hello");
+
+                // 本地代码访问和修改ClassField为中的静态属性num
+                NDKHelper.accessInstanceField(obj);
+                return NDKHelper.accessStaticField() + "\nafter modified : " + obj.getStr();
+            }
+        });
     }
 
     private void addLayout(String name, String info, final ClickListener listner) {

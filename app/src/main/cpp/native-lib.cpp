@@ -161,3 +161,94 @@ Java_com_example_ndktest_ndk_NDKHelper_callJavaInstaceMethod
     return result;
 }
 
+/*
+ *
+ * Method:    accessInstanceField
+ * Signature: ()V
+ */
+extern "C"
+void
+Java_com_example_ndktest_ndk_NDKHelper_accessInstanceField
+        (JNIEnv *env, jclass cls, jobject obj)
+{
+    jclass clazz;
+    jfieldID fid;
+    jstring j_str;
+    jstring j_newStr;
+    const char *c_str = NULL;
+
+    // 1.获取ClassField类的Class引用
+    clazz = env->GetObjectClass(obj);
+    if (clazz == NULL) {
+        return;
+    }
+
+    // 2. 获取ClassField类实例变量str的属性ID
+    fid = env->GetFieldID(clazz,"str", "Ljava/lang/String;");
+    if (clazz == NULL) {
+        return;
+    }
+
+    // 3. 获取实例变量str的值
+    j_str = (jstring)env->GetObjectField(obj,fid);
+
+    // 4. 将unicode编码的java字符串转换成C风格字符串
+    c_str = env->GetStringUTFChars(j_str,NULL);
+    if (c_str == NULL) {
+        return;
+    }
+    LOG("In C--->ClassField.str = %s\n", c_str);
+    env->ReleaseStringUTFChars(j_str, c_str);
+
+    // 5. 修改实例变量str的值
+    j_newStr = env->NewStringUTF("This is C String");
+    if (j_newStr == NULL) {
+        return;
+    }
+
+    env->SetObjectField(obj, fid, j_newStr);
+
+    // 6.删除局部引用
+    env->DeleteLocalRef(clazz);
+    env->DeleteLocalRef(j_str);
+    env->DeleteLocalRef(j_newStr);
+}
+
+/*
+ *
+ * Method:    accessStaticField
+ * Signature: ()V
+ */
+extern "C"
+jint
+Java_com_example_ndktest_ndk_NDKHelper_accessStaticField
+        (JNIEnv *env, jclass cls)
+{
+    jclass clazz;
+    jfieldID fid;
+    jint num;
+
+    //1.获取ClassField类的Class引用
+    clazz = env->FindClass("com/example/ndktest/ClassField");
+    if (clazz == NULL) {    // 错误处理
+        return -999;
+    }
+
+    //2.获取ClassField类静态变量num的属性ID
+    fid = env->GetStaticFieldID(clazz, "num", "I");
+    if (fid == NULL) {
+        return -999;
+    }
+
+    // 3.获取静态变量num的值
+    num = env->GetStaticIntField(clazz,fid);
+    printf("In C--->ClassField.num = %d\n", num);
+
+    // 4.修改静态变量num的值
+    env->SetStaticIntField(clazz, fid, 80);
+
+    // 删除属部引用
+    env->DeleteLocalRef(clazz);
+
+    return num;
+}
