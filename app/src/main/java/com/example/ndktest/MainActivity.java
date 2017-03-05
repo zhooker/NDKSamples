@@ -39,13 +39,21 @@ public class MainActivity extends AppCompatActivity {
                     buffer.append(arr[i] + " ");
                 }
 
-                buffer.append("\n" + NDKHelper.sumArray(arr) +"\n");
+                buffer.append("\n" + NDKHelper.sumArray(arr) + "\n");
 
                 buffer.append("after    :");
                 for (int i = 0; i < arr.length; i++) {
                     buffer.append(arr[i] + " ");
                 }
                 return buffer.toString();
+            }
+        });
+
+        addLayout("点击", "C++ 访问 Java 实例方法和静态方法", new ClickListener() {
+            @Override
+            public String getResult() {
+                return NDKHelper.callJavaInstaceMethod() + "\n" +
+                        NDKHelper.callJavaStaticMethod();
             }
         });
     }

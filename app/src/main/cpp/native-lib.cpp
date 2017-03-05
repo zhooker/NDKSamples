@@ -63,3 +63,101 @@ Java_com_example_ndktest_ndk_NDKHelper_sumArray
     env->SetIntArrayRegion(j_array,0,1,&temp); //反射修改Java數組的值
     return sum;
 }
+
+/*
+ * CallStaticXXXMethod(env, clazz, methodID, ...)
+ * CallStaticXXXMethodV(env, clazz, methodID, va_list args)
+ * CallStaticXXXMethodA(env, clazz, methodID, const jvalue args)
+ *
+ * Method:    callJavaStaticMethod
+ * Signature: ()V
+ */
+extern "C"
+jstring
+Java_com_example_ndktest_ndk_NDKHelper_callJavaStaticMethod
+        (JNIEnv *env, jclass cls) {
+    jclass clazz = NULL;
+    jstring str_arg = NULL;
+    jmethodID mid_static_method;
+    // 1、从classpath路径下搜索ClassMethod这个类，并返回该类的Class对象
+    clazz = env->FindClass("com/example/ndktest/ClassMethod");
+    if (clazz == NULL) {
+        LOG("找不到'com.example.ndktest.ClassMethod'这个类");
+        return env->NewStringUTF("找不到'com.example.ndktest.ClassMethod'这个类");
+    }
+
+    // 2、从clazz类中查找callStaticMethod方法
+    mid_static_method = env->GetStaticMethodID(clazz,"callStaticMethod","(Ljava/lang/String;I)Ljava/lang/String;");
+    if (mid_static_method == NULL) {
+        LOG("找不到callStaticMethod这个静态方法。");
+        return env->NewStringUTF("找不到callStaticMethod这个静态方法。");
+    }
+
+    // 3、调用clazz类的callStaticMethod静态方法
+    str_arg = env->NewStringUTF("我是静态方法");
+    //env->CallStaticVoidMethod(clazz,mid_static_method, str_arg, 100);
+    jstring result = (jstring)env->CallStaticObjectMethod(clazz,mid_static_method, str_arg, 100);
+
+    // 删除局部引用
+    env->DeleteLocalRef(clazz);
+    env->DeleteLocalRef(str_arg);
+
+    return result;
+}
+
+/*
+ * CallXXXMethod
+ *
+ * Method:    callJavaInstaceMethod
+ * Signature: ()V
+ */
+extern "C"
+jstring
+Java_com_example_ndktest_ndk_NDKHelper_callJavaInstaceMethod
+        (JNIEnv *env, jclass cls)
+{
+    jclass clazz = NULL;
+    jobject jobj = NULL;
+    jmethodID mid_construct = NULL;
+    jmethodID mid_instance = NULL;
+    jstring str_arg = NULL;
+    // 1、从classpath路径下搜索ClassMethod这个类，并返回该类的Class对象
+    clazz = env->FindClass("com/example/ndktest/ClassMethod");
+    if (clazz == NULL) {
+        LOG("找不到'com.example.ndktest.ClassMethod'这个类");
+        return env->NewStringUTF("找不到'com.example.ndktest.ClassMethod'这个类");
+    }
+
+    // 2、获取类的默认构造方法ID
+    mid_construct = env->GetMethodID(clazz, "<init>","()V");
+    if (mid_construct == NULL) {
+        LOG("找不到默认的构造方法");
+        return env->NewStringUTF("找不到默认的构造方法");
+    }
+
+    // 3、查找实例方法的ID
+    mid_instance = env->GetMethodID(clazz, "callInstanceMethod","(Ljava/lang/String;I)Ljava/lang/String;");
+    if (mid_instance == NULL) {
+        return env->NewStringUTF("找不到callInstanceMethod方法");
+    }
+
+    // 4、创建该类的实例
+    jobj = env->NewObject(clazz,mid_construct);
+    if (jobj == NULL) {
+        LOG("创建com.example.ndktest.ClassMethod类失败。");
+        return env->NewStringUTF("创建com.example.ndktest.ClassMethod类失败。");
+    }
+
+    // 5、调用对象的实例方法
+    str_arg = env->NewStringUTF("我是实例方法");
+    //env->CallVoidMethod(jobj,mid_instance,str_arg,200);
+    jstring result = (jstring)env->CallObjectMethod(jobj,mid_instance, str_arg, 200);
+
+    // 删除局部引用
+    env->DeleteLocalRef(clazz);
+    env->DeleteLocalRef(jobj);
+    env->DeleteLocalRef(str_arg);
+
+    return result;
+}
+

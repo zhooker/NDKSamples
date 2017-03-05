@@ -17,4 +17,9 @@ public class NDKHelper {
 
     public static native int sumArray(int[] arr);
 
+    public static native String callJavaStaticMethod();
+
+    public static native String callJavaInstaceMethod();
+
+
 }
