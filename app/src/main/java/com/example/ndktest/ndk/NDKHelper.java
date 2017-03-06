@@ -26,4 +26,6 @@ public class NDKHelper {
     public native static void accessInstanceField(ClassField obj);
 
     public native static int accessStaticField();
+
+    public native static String callSuperInstanceMethod();
 }

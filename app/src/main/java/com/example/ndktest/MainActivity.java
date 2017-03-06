@@ -65,8 +65,17 @@ public class MainActivity extends AppCompatActivity {
                 obj.setStr("Hello");
 
                 // 本地代码访问和修改ClassField为中的静态属性num
+                // 不能修改static final 的值
                 NDKHelper.accessInstanceField(obj);
-                return NDKHelper.accessStaticField() + "\nafter modified : " + obj.getStr();
+                NDKHelper.accessStaticField();
+                return obj.getNum() + "\nafter modified : " + obj.getStr();
+            }
+        });
+
+        addLayout("点击", "JNI 调用构造方法和父类实例方法。", new ClickListener() {
+            @Override
+            public String getResult() {
+                return NDKHelper.callSuperInstanceMethod();
             }
         });
     }

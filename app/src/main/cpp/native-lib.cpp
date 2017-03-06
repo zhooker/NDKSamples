@@ -242,7 +242,7 @@ Java_com_example_ndktest_ndk_NDKHelper_accessStaticField
 
     // 3.获取静态变量num的值
     num = env->GetStaticIntField(clazz,fid);
-    printf("In C--->ClassField.num = %d\n", num);
+    LOG("In C--->ClassField.num = %d\n", num);
 
     // 4.修改静态变量num的值
     env->SetStaticIntField(clazz, fid, 80);
@@ -251,4 +251,80 @@ Java_com_example_ndktest_ndk_NDKHelper_accessStaticField
     env->DeleteLocalRef(clazz);
 
     return num;
+}
+
+extern "C"
+jstring
+Java_com_example_ndktest_ndk_NDKHelper_callSuperInstanceMethod
+        (JNIEnv *env, jclass cls)
+{
+    jclass cls_cat;
+    jclass cls_animal;
+    jmethodID mid_cat_init;
+    jmethodID mid_run;
+    jmethodID mid_getName;
+    jstring c_str_name;
+    jobject obj_cat;
+    const char *name = NULL;
+
+    // 1、获取Cat类的class引用
+    cls_cat = env->FindClass("com/example/ndktest/Cat");
+    if (cls_cat == NULL) {
+        return env->NewStringUTF("找不到类Cat");
+    }
+
+    // 2、获取Cat的构造方法ID(构造方法的名统一为：<init>)
+    mid_cat_init = env->GetMethodID(cls_cat, "<init>", "(Ljava/lang/String;)V");
+    if (mid_cat_init == NULL) {
+        return env->NewStringUTF("没有找到只有一个参数为String的构造方法");
+    }
+
+    // 3、创建一个String对象，作为构造方法的参数
+    c_str_name = env->NewStringUTF("汤姆猫");
+    if (c_str_name == NULL) {
+        return env->NewStringUTF("创建字符串失败（内存不够）");
+    }
+
+    //  4、创建Cat对象的实例(调用对象的构造方法并初始化对象)
+    obj_cat = env->NewObject(cls_cat, mid_cat_init,c_str_name);
+    if (obj_cat == NULL) {
+        return env->NewStringUTF("创建Cat实例失败（内存不够）");
+    }
+
+    //-------------- 5、调用Cat父类Animal的run和getName方法 --------------
+    cls_animal = env->FindClass("com/example/ndktest/Animal");
+    if (cls_animal == NULL) {
+        return env->NewStringUTF("找不到父类Animal");
+    }
+
+    // 例1： 调用父类的run方法
+    mid_run = env->GetMethodID(cls_animal, "run", "()V");    // 获取父类Animal中run方法的id
+    if (mid_run == NULL) {
+        return env->NewStringUTF("找不到Animal run");
+    }
+
+    // 注意：obj_cat是Cat的实例，cls_animal是Animal的Class引用，mid_run是Animal类中的方法ID
+    env->CallNonvirtualVoidMethod(obj_cat, cls_animal, mid_run);
+
+    // 例2：调用父类的getName方法
+    // 获取父类Animal中getName方法的id
+    mid_getName = env->GetMethodID(cls_animal, "getName", "()Ljava/lang/String;");
+    if (mid_getName == NULL) {
+        return env->NewStringUTF("找不到Animal getName");
+    }
+
+    c_str_name = (jstring) env->CallNonvirtualObjectMethod(obj_cat, cls_animal, mid_getName);
+    name = env->GetStringUTFChars(c_str_name, NULL);
+    LOG("In C: Animal Name is %s\n", name);
+
+    // 释放从java层获取到的字符串所分配的内存
+    env->ReleaseStringUTFChars(c_str_name, name);
+
+    // 删除局部引用（jobject或jobject的子类才属于引用变量），允许VM释放被局部变量所引用的资源
+    env->DeleteLocalRef(cls_cat);
+    env->DeleteLocalRef(cls_animal);
+    //env->DeleteLocalRef(c_str_name);
+    env->DeleteLocalRef(obj_cat);
+
+    return c_str_name;
 }
