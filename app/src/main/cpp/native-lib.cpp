@@ -1,6 +1,8 @@
 #include <jni.h>
 #include <string>
 #include <android/log.h>
+#include <dlfcn.h>
+#include <stdlib.h>
 
 #define TAG "zhuangsj"
 #define LOG(...)  __android_log_print(ANDROID_LOG_DEBUG,TAG,__VA_ARGS__)
@@ -327,4 +329,44 @@ Java_com_example_ndktest_ndk_NDKHelper_callSuperInstanceMethod
     env->DeleteLocalRef(obj_cat);
 
     return c_str_name;
+}
+
+extern "C" int hello(){
+    printf("Hello World\n");
+    return 999;
+}
+
+extern "C"
+jint
+Java_com_example_ndktest_ndk_NDKHelper_openSharedLibrary(
+        JNIEnv *env,
+        jobject /* this */,
+        jstring str) {
+    void*  filehandle = dlopen(env->GetStringUTFChars(str,NULL), RTLD_LAZY );
+    int ll = -1;
+    if(filehandle)
+    {
+        LOG("open so success!!!");
+        int( * getinformation ) ();
+        getinformation = (int (*)())dlsym(filehandle, "hello");
+        if( getinformation )
+        {
+            LOG("call function getinformation OK!");
+            ll = getinformation();
+        }
+        else
+        {
+            ll = -3;
+            LOG("call function getinformation! ERROR!");
+        }
+        LOG("return value=%d",ll);
+        dlclose(filehandle);
+        filehandle=0;
+    }
+    else
+    {
+        ll = -2;
+        LOG("open so ERROR!");
+    }
+    return ll;
 }

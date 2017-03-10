@@ -28,4 +28,6 @@ public class NDKHelper {
     public native static int accessStaticField();
 
     public native static String callSuperInstanceMethod();
+
+    public native static int openSharedLibrary(String path);
 }
