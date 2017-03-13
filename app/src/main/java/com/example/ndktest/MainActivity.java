@@ -35,14 +35,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        addLayout("点击", "传递字符串到JNI,转化并返回．", new ClickListener() {
+        addLayout("传递字符串到JNI,转化并返回．", new ClickListener() {
             @Override
             public String getResult() {
                 return NDKHelper.stringFromJNI("stringFromJNI");
             }
         });
 
-        addLayout("点击", "JNI 访问、修改数组", new ClickListener() {
+        addLayout("JNI 访问、修改数组", new ClickListener() {
             @Override
             public String getResult() {
                 int[] arr = new int[10];
@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        addLayout("点击", "C++ 访问 Java 实例方法和静态方法", new ClickListener() {
+        addLayout("C++ 访问 Java 实例方法和静态方法", new ClickListener() {
             @Override
             public String getResult() {
                 return NDKHelper.callJavaInstaceMethod() + "\n" +
@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        addLayout("点击", "C++ 访问 Java 实例变量和静态变量", new ClickListener() {
+        addLayout("C++ 访问 Java 实例变量和静态变量", new ClickListener() {
             @Override
             public String getResult() {
                 ClassField obj = new ClassField();
@@ -89,14 +89,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        addLayout("点击", "JNI 调用构造方法和父类实例方法。", new ClickListener() {
+        addLayout("JNI 调用构造方法和父类实例方法。", new ClickListener() {
             @Override
             public String getResult() {
                 return NDKHelper.callSuperInstanceMethod();
             }
         });
 
-        addLayout("点击", "JNI 打开第三方动态库。", new ClickListener() {
+        addLayout("JNI 打开第三方动态库。", new ClickListener() {
             @Override
             public String getResult() {
                 final String libraryName = "libnative.so";
@@ -125,18 +125,18 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void addLayout(String name, String info, final ClickListener listner) {
+    private void addLayout(String info, final ClickListener listner) {
         LinearLayout llyt = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.activity_main_item, null);
-        TextView infotv = (TextView) llyt.findViewById(R.id.info);
-        infotv.setText(info);
 
         final TextView tv = (TextView) llyt.findViewById(R.id.result);
+        tv.setVisibility(View.GONE);
         Button btn = (Button) llyt.findViewById(R.id.btn);
-        btn.setText(name);
+        btn.setText(info);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String result = listner.getResult();
+                tv.setVisibility(View.VISIBLE);
                 tv.setText(result);
             }
         });
