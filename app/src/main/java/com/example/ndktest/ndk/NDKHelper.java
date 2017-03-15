@@ -1,5 +1,7 @@
 package com.example.ndktest.ndk;
 
+import android.os.Handler;
+
 import com.example.ndktest.ClassField;
 
 /**
@@ -30,4 +32,6 @@ public class NDKHelper {
     public native static String callSuperInstanceMethod();
 
     public native static int openSharedLibrary(String path);
+
+    public native static void callHandlerFromJava(Handler handler);
 }

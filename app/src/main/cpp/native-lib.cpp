@@ -2,10 +2,8 @@
 #include <string>
 #include <android/log.h>
 #include <dlfcn.h>
-#include <stdlib.h>
+#include "common.h"
 
-#define TAG "zhuangsj"
-#define LOG(...)  __android_log_print(ANDROID_LOG_DEBUG,TAG,__VA_ARGS__)
 
 extern "C"
 jstring
@@ -369,4 +367,36 @@ Java_com_example_ndktest_ndk_NDKHelper_openSharedLibrary(
         LOG("open so ERROR!");
     }
     return ll;
+}
+
+extern "C"
+void
+Java_com_example_ndktest_ndk_NDKHelper_callHandlerFromJava(JNIEnv *env, jclass type,
+                                                           jobject handler) {
+    jclass clazz = env->GetObjectClass(handler);
+
+    // 1. 通过Handler的obtainMessage来获取Message
+    jmethodID mid_send = env->GetMethodID(clazz,"obtainMessage","()Landroid/os/Message;");
+    jobject msg = env->CallObjectMethod(handler,mid_send);
+
+    // 2. 自己创建一个Message的实例
+    // jclass msgclazz = env->FindClass("android/os/Message");
+    // jmethodID mid_construct = env->GetMethodID(msgclazz, "<init>","()V");
+    // jobject msg = env->NewObject(msgclazz,mid_construct);
+
+    jclass msgclazz = env->GetObjectClass(msg);
+    jfieldID fid_what = env->GetFieldID(msgclazz,"what","I");
+    env->SetIntField(msg,fid_what,888);
+    fid_what = env->GetFieldID(msgclazz,"arg1","I");
+    env->SetIntField(msg,fid_what,1);
+    fid_what = env->GetFieldID(msgclazz,"arg2","I");
+    env->SetIntField(msg,fid_what,2);
+
+    mid_send = env->GetMethodID(clazz,"sendMessage","(Landroid/os/Message;)Z");
+    env->CallBooleanMethod(handler,mid_send,msg);
+
+
+    // 3. 直接发Message
+    mid_send = env->GetMethodID(clazz,"sendEmptyMessage","(I)Z");
+    env->CallBooleanMethod(handler,mid_send,999);
 }

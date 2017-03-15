@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -121,6 +123,20 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 return "result:" + NDKHelper.openSharedLibrary(path);
+            }
+        });
+
+        addLayout("JNI 调用Handler传送数据。", new ClickListener() {
+            @Override
+            public String getResult() {
+                NDKHelper.callHandlerFromJava(new Handler() {
+                    @Override
+                    public void handleMessage(Message msg) {
+                        Log.e("zhuangsj", "JNI -> 调用Handler传送数据 :  what=" + msg.what +",arg1=" + msg.arg1 + ",arg2=" + msg.arg2);
+                    }
+                });
+
+                return "000";
             }
         });
     }
