@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
         addLayout("JNI 打开第三方动态库。", new ClickListener() {
             @Override
             public String getResult() {
-                final String libraryName = "libnative.so";
+                final String libraryName = "";
                 final String path = "/data/data/com.example.ndktest/" + libraryName;
                 try {
                     InputStream is = getAssets().open(libraryName);
@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.e("zhuangsj", "JNI 打开第三方动态库  " + e);
                     e.printStackTrace();
                 }
-                return "result:" + NDKHelper.openSharedLibrary(path);
+                return "result:" + NDKHelper.openSharedLibrary("libnative-hello.so");
             }
         });
 
